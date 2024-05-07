@@ -66,9 +66,9 @@ app.get("/api/3/sites", (req, res) => {
 });
 
 app.get("/api/3/assets", (req, res) => {
-  const resources = [];
-  for (let i = 0; i < 50_000; i++) {
-    resources.push({
+  const assetsResources = [];
+  for (let i = 0; i < 500; i++) {
+    assetsResources.push({
       hostName: faker.internet.domainName(),
       id: faker.string.uuid(),
       ip: faker.internet.ip(),
@@ -103,7 +103,8 @@ app.get("/api/3/assets", (req, res) => {
     });
   }
   const data = {
-    resources,
+    resources: assetsResources,
+    page: { totalPages: 100 },
   };
   res.status(200).json(data);
 });
