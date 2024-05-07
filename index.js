@@ -1,6 +1,7 @@
 const express = require("express");
 const { faker } = require("@faker-js/faker");
 const sampleSize = require("lodash/sampleSize");
+const vulnResources = require("./vulnResources");
 
 const app = express();
 
@@ -264,24 +265,6 @@ app.get("/api/3/assets/:assetId/users", (req, res) => {
     links: [],
   });
 });
-
-const vulnResources = [];
-for (let i = 0; i < 9600; i++) {
-  vulnResources.push({
-    id: faker.string.uuid(),
-    instances: faker.number.int(),
-    links: [],
-    results: [
-      {
-        proof: faker.string.uuid(),
-        since: faker.date.past().toISOString(),
-        status: "open",
-      },
-    ],
-    since: faker.date.past().toISOString(),
-    status: "vulnerable",
-  });
-}
 
 app.get("/api/3/assets/:assetId/vulnerabilities", (req, res) => {
   const data = {
