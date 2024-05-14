@@ -2,6 +2,7 @@ const express = require("express");
 const { faker } = require("@faker-js/faker");
 const sampleSize = require("lodash/sampleSize");
 const vulnResources = require("./vulnResources");
+const chunk = require("lodash/chunk");
 
 const app = express();
 
@@ -268,30 +269,22 @@ app.get("/api/3/assets/:assetId/users", (req, res) => {
 
 app.get("/api/3/assets/:assetId/vulnerabilities", (req, res) => {
   const data = {
-    resources: sampleSize(vulnResources, 800),
+    resources: sampleSize(vulnResources, 40).map((el) => el.finding),
   };
   res.status(200).json(data);
 });
 
-app.get("/api/3/vulnerabilities/:vulnId", (req, res) => {
-  const vulnId = req.params.vulnId;
-  const data = {
-    denialOfService: false,
-    description: {
-      text: faker.lorem.sentence(),
-    },
-    exploits: faker.number.int(),
-    id: vulnId,
-    riskScore: faker.number.int({ max: 9 }),
-    severity: "Severe",
-    severityScore: 6,
-    title: faker.lorem.slug(),
-    categories: [],
-  };
-  res.status(200).json(data);
+const vulnPages = chunk(vulnResources, 500);
+
+app.get("/api/3/vulnerabilities", (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  res.status(200).json({
+    resources: vulnPages[page].map((el) => el.vulnerability) || [],
+    page: { totalPages: vulnPages.length },
+  });
 });
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
